@@ -147,3 +147,4 @@ C:\Users\Nicolas - PC\Desktop\TrabajadoresPrueba_Codigo\TrabajadoresPrueba\obj\D
 C:\Users\Nicolas - PC\Desktop\TrabajadoresPrueba_Codigo\TrabajadoresPrueba\obj\Debug\net9.0\compressed\n05rty6c4p-552rd58pdr.gz
 C:\Users\Nicolas - PC\Desktop\TrabajadoresPrueba_Codigo\TrabajadoresPrueba\obj\Debug\net9.0\compressed\t359wrshdr-9roag5negl.gz
 C:\Users\Nicolas - PC\Desktop\TrabajadoresPrueba_Codigo\TrabajadoresPrueba\obj\Debug\net9.0\compressed\wo2uuhwf6s-y1poagvwst.gz
+C:\Users\Nicolas - PC\Desktop\TrabajadoresPrueba_Codigo\TrabajadoresPrueba\obj\Debug\net9.0\TrabajadoresPrueba.sourcelink.json
