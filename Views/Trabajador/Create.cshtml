@@ -1,0 +1,50 @@
+@model TrabajadoresPrueba.Models.Trabajador
+
+@{
+    ViewData["Title"] = "Registrar Trabajador";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="TipoDocumento"></label>
+        <input asp-for="TipoDocumento" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NumeroDocumento"></label>
+        <input asp-for="NumeroDocumento" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Nombres"></label>
+        <input asp-for="Nombres" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Sexo"></label>
+        <select asp-for="Sexo" class="form-control">
+            <option value="">Seleccione</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Departamento</label>
+        <select asp-for="IdDepartamento" asp-items="ViewBag.Departamentos" class="form-control" id="DepartamentoSelect"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Provincia</label>
+        <select asp-for="IdProvincia" asp-items="ViewBag.Provincias" class="form-control" id="ProvinciaSelect"></select>
+    </div>
+
+    <div class="form-group">
+        <label>Distrito</label>
+        <select asp-for="IdDistrito" asp-items="ViewBag.Distritos" class="form-control" id="DistritoSelect"></select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

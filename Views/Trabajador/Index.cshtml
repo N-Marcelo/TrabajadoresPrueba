@@ -1,0 +1,267 @@
+﻿@model TrabajadoresPrueba.Models.ViewModels.TrabajadorViewModel
+
+@{
+    ViewData["Title"] = "Gestor de Trabajadores";
+    Layout = "_Layout";
+}
+<!-- Botón de Registro de trabajador -->
+<button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#crearModal">
+    Registrar trabajador
+</button>
+<!-- Filtro de género -->
+<div class="row mb-3">
+    <div class="col-md-3">
+        <select id="filtroSexo" class="form-select">
+            <option value="">Todos</option>
+            <option value="M">Masculino</option>
+            <option value="F">Femenino</option>
+        </select>
+    </div>
+</div>
+<!-- Inicio de tabla de listado de datos (Se usa el SP) -->
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Tipo Doc.</th>
+            <th>Número Doc.</th>
+            <th>Nombres</th>
+            <th>Sexo</th>
+            <th>Departamento</th>
+            <th>Provincia</th>
+            <th>Distrito</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.ListaTrabajadores)
+        {
+            <tr id="row-@t.Id" data-sexo="@t.Sexo" class="@(t.Sexo == "M" ? "table-row-m" : "table-row-f")">
+                <td>@t.TipoDocumento</td>
+                <td>@t.NumeroDocumento</td>
+                <td>@t.Nombres</td>
+                <td>@t.Sexo</td>
+                <td>@t.NombreDepartamento</td>
+                <td>@t.NombreProvincia</td>
+                <td>@t.NombreDistrito</td>
+                <td>
+                    <button class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                        data-bs-target="#editarModal-@t.Id">Editar</button>
+                    <button class="btn btn-sm btn-danger" type="button"
+                        onclick="eliminarTrabajador(@t.Id)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<!-- Fin de tabla de listado -->
+
+<!-- Modal CREAR -->
+<div class="modal fade" id="crearModal" tabindex="-1" aria-labelledby="crearModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="Create" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Registrar nuevo trabajador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label asp-for="NuevoTrabajador.TipoDocumento"></label>
+                        <select asp-for="NuevoTrabajador.TipoDocumento" class="form-control">
+                            <option value="">Seleccione</option>
+                            <option value="DNI">DNI</option>
+                            <option value="CE">Carné de Extranjería</option>
+                            <option value="PAS">Pasaporte</option>
+                        </select>
+                        <span asp-validation-for="NuevoTrabajador.TipoDocumento" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NuevoTrabajador.NumeroDocumento"></label>
+                        <input asp-for="NuevoTrabajador.NumeroDocumento" class="form-control" />
+                        <span asp-validation-for="NuevoTrabajador.NumeroDocumento" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NuevoTrabajador.Nombres"></label>
+                        <input asp-for="NuevoTrabajador.Nombres" class="form-control" />
+                        <span asp-validation-for="NuevoTrabajador.Nombres" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="NuevoTrabajador.Sexo"></label>
+                        <select asp-for="NuevoTrabajador.Sexo" class="form-control">
+                            <option value="">Seleccione</option>
+                            <option value="M">Masculino</option>
+                            <option value="F">Femenino</option>
+                        </select>
+                        <span asp-validation-for="NuevoTrabajador.Sexo" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label>Departamento</label>
+                        <select asp-for="NuevoTrabajador.IdDepartamento"
+                            asp-items="@(new SelectList(Model.Departamentos, "Id", "NombreDepartamento"))"
+                            class="form-control" id="DepartamentoSelect"></select>
+                        <span asp-validation-for="NuevoTrabajador.IdDepartamento" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label>Provincia</label>
+                        <select asp-for="NuevoTrabajador.IdProvincia"
+                            asp-items="@(new SelectList(Model.Provincias, "Id", "NombreProvincia"))"
+                            class="form-control" id="ProvinciaSelect"></select>
+                        <span asp-validation-for="NuevoTrabajador.IdProvincia" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label>Distrito</label>
+                        <select asp-for="NuevoTrabajador.IdDistrito"
+                            asp-items="@(new SelectList(Model.Distritos, "Id", "NombreDistrito"))" class="form-control"
+                            id="DistritoSelect"></select>
+                        <span asp-validation-for="NuevoTrabajador.IdDistrito" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Fin de Modal para crear -->
+<!-- Modal de Edición (uno por cada trabajador) -->
+@foreach (var trabajador in Model.ListaTrabajadores)
+{
+    <div class="modal fade" id="editarModal-@trabajador.Id" tabindex="-1" aria-labelledby="editarModalLabel-@trabajador.Id"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form asp-action="Edit" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Editar trabajador</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Se obtiene el id del trabajador para editar-->
+                        <input type="hidden" asp-for="TrabajadorEditar.Id" value="@trabajador.Id" />
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.TipoDocumento" class="form-label"></label>
+                            <select asp-for="TrabajadorEditar.TipoDocumento" class="form-control">
+                                <option value="DNI">DNI</option>
+                                <option value="CE">Carné de Extranjería</option>
+                                <option value="PAS">Pasaporte</option>
+                            </select>
+                            <span asp-validation-for="TrabajadorEditar.TipoDocumento" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.NumeroDocumento" class="form-label"></label>
+                            <input asp-for="TrabajadorEditar.NumeroDocumento" class="form-control"
+                                value="@trabajador.NumeroDocumento" />
+                            <span asp-validation-for="TrabajadorEditar.NumeroDocumento" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.Nombres" class="form-label"></label>
+                            <input asp-for="TrabajadorEditar.Nombres" class="form-control" value="@trabajador.Nombres" />
+                            <span asp-validation-for="TrabajadorEditar.Nombres" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.Sexo" class="form-label"></label>
+                            <select asp-for="TrabajadorEditar.Sexo" class="form-control">
+                                <option value="M">Masculino</option>
+                                <option value="F">Femenino</option>
+                            </select>
+                            <span asp-validation-for="TrabajadorEditar.Sexo" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.IdDepartamento" class="form-label">Departamento</label>
+                            <select asp-for="TrabajadorEditar.IdDepartamento" class="form-control departamento-editar"
+                                data-id="@trabajador.Id" data-provincia="@trabajador.IdProvincia"
+                                data-distrito="@trabajador.IdDistrito">
+                                @foreach (var departamento in Model.Departamentos)
+                                {
+                                    <option value="@departamento.Id" selected="@(departamento.Id == trabajador.IdDepartamento)">
+                                        @departamento.NombreDepartamento</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TrabajadorEditar.IdDepartamento" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.IdProvincia" class="form-label">Provincia</label>
+                            <select asp-for="TrabajadorEditar.IdProvincia" class="form-control provincia-editar"
+                                data-id="@trabajador.Id">
+                                @if (Model.Provincias != null && Model.Provincias.Any(p => p.IdDepartamento ==
+                                                            trabajador.IdDepartamento))
+                                {
+                                    foreach (var provincia in Model.Provincias.Where(p => p.IdDepartamento ==
+                                    trabajador.IdDepartamento))
+                                    {
+                                        <option value="@provincia.Id" selected="@(provincia.Id == trabajador.IdProvincia)">
+                                            @provincia.NombreProvincia</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">Seleccione una provincia</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TrabajadorEditar.IdProvincia" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrabajadorEditar.IdDistrito" class="form-label">Distrito</label>
+                            <select asp-for="TrabajadorEditar.IdDistrito" class="form-control distrito-editar"
+                                data-id="@trabajador.Id">
+                                @if (Model.Distritos != null && Model.Distritos.Any(d => d.IdProvincia ==
+                                                            trabajador.IdProvincia))
+                                {
+                                    foreach (var distrito in Model.Distritos.Where(d => d.IdProvincia ==
+                                    trabajador.IdProvincia))
+                                    {
+                                        <option value="@distrito.Id" selected="@(distrito.Id == trabajador.IdDistrito)">
+                                            @distrito.NombreDistrito</option>
+                                    }
+                                }
+                                else
+                                {
+                                    <option value="">Seleccione un distrito</option>
+                                }
+                            </select>
+                            <span asp-validation-for="TrabajadorEditar.IdDistrito" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+<!-- Fin de Modal de Editar -->
+
+<!-- Scripts condicionales -->
+@if (ViewData["MostrarModalCrear"] as bool? == true)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalCrear = new bootstrap.Modal(document.getElementById('crearModal'));
+            modalCrear.show();
+        });
+    </script>
+}
+@if (ViewData["MostrarModalEditarId"] != null)
+{
+    var id = ViewData["MostrarModalEditarId"];
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const modalEditar = new bootstrap.Modal(document.getElementById('editarModal-@id'));
+            modalEditar.show();
+        });
+    </script>
+}
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
